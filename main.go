@@ -1,17 +1,21 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 type server struct{}
 
-type cart struct {
-	name  string
-	price float64
+type Item struct {
+	Name  string  `json:"name"`
+	Price float64 `json:"price"`
+}
+
+type Cart struct {
+	Item []Item
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -30,20 +34,16 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// 	w.Write([]byte(`{"Input Slice": "TEST"}`))
 	case "POST":
-		body, err := ioutil.ReadAll(r.Body)
+		var item Item
+		err := json.NewDecoder(r.Body).Decode(&item)
 		if err != nil {
-			http.Error(w, "Error reading request body",
-				http.StatusInternalServerError)
+			http.Error(w, err.Error(), 400)
+			return
 		}
-
-		log.Println(string(body))
-		// results = append(results, string(body))
-
-		fmt.Fprint(w, "POST done")
+		fmt.Fprintf(w, item.Name)
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{"Response": "Not Found"}`))
-
 	}
 }
 
