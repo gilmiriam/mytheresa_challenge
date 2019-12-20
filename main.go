@@ -2,18 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
 
 type server struct{}
 
+var cart *Cart = &Cart{}
+
+//Item defines the item input
 type Item struct {
 	Name  string  `json:"name"`
 	Price float64 `json:"price"`
 }
 
+//Cart defines the entire cart
 type Cart struct {
 	Item []Item
 }
@@ -21,34 +24,38 @@ type Cart struct {
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
-	// case "GET":
-	// 	w.WriteHeader(http.StatusOK)
-	// 	keys, ok := r.URL.Query()["key"]
-
-	// 	if !ok || len(keys[0]) < 1 {
-	// 		log.Println("Url Param 'key' is missing")
-	// 		return
-	// 	}
-
-	// 	key := keys[0]
-
-	// 	w.Write([]byte(`{"Input Slice": "TEST"}`))
+	case "GET":
+		w.WriteHeader(http.StatusOK)
+		js, err := json.Marshal(cart)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(js)
 	case "POST":
-		var item Item
+		item := Item{}
 		err := json.NewDecoder(r.Body).Decode(&item)
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
-		fmt.Fprintf(w, item.Name)
+		cart.SaveObject(item)
+
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(`{"Response": "Not Found"}`))
 	}
 }
 
+//SaveObject save the object into Cart struct
+func (saveCart *Cart) SaveObject(item Item) {
+	saveCart.Item = append(saveCart.Item, item)
+	log.Println(saveCart)
+}
+
 func main() {
 	s := &server{}
 	http.Handle("/addItem", s)
+	http.Handle("/getItems", s)
 	log.Fatal(http.ListenAndServe(":8181", nil))
 }
