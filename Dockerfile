@@ -1,5 +1,5 @@
 FROM golang:1.13.4
-WORKDIR /go/src/github.com/tangelo_challenge
+WORKDIR /go/src/github.com/mytheresa_challenge
 COPY . .
 
 RUN go get -d -v ./...

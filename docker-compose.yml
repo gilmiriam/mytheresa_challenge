@@ -5,5 +5,5 @@ services:
     ports:
       - "8181:8181"
     volumes:
-      - .:/go/src/github.com/tangelo_challenge
+      - .:/go/src/github.com/mytheresa_challenge
     command: tail -f /dev/null

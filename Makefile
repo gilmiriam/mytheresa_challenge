@@ -6,8 +6,11 @@ run: ## Start the server application
 test: ## Run the test suite
 	docker exec -ti mytheresa_challenge_app_1 bash -c 'go test ./...'
 
-testApi: ## Run only the test corresponding to the response from the API
-	docker exec -ti mytheresa_challenge_app_1 bash -c 'go test -v -run Test_requestAPI'
+testPost: ## Run only the test corresponding to the response from the API
+	docker exec -ti mytheresa_challenge_app_1 bash -c 'go test -v -run Test_requestPOSTAPI'
+
+testGet: ## Run only the test corresponding to the response from the API
+	docker exec -ti mytheresa_challenge_app_1 bash -c 'go test -v -run Test_requestGETAPI'
 
 clean: ## Clean up build artifacts
 	docker-compose down -v
